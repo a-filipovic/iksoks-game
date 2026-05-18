@@ -1,25 +1,28 @@
-package game;
+package games.fourinline;
 
 import java.util.ArrayList;
 import java.util.List;
 
-enum PlayerType { Player, Opponent }
-
-public abstract class GameLogic {
+public abstract class FourInLineLogic {
     protected int WIDTH = 4;
     protected int HEIGHT = 4;
 
-    static class Field {
-        private int x;
-        private int y;
+    public static class Field {
+        private final int x;
+        private final int y;
 
         public Field(int x, int y) {
             this.x = x;
             this.y = y;
         }
 
-        public int getX() { return x; }
-        public int getY() { return y; }
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
     }
 
     protected static class MinMaxRes {
@@ -32,16 +35,16 @@ public abstract class GameLogic {
         }
     }
 
-    protected PlayerType grid[][];
+    protected PlayerType[][] grid;
     protected List<Field> winFields;
 
-    public GameLogic() {
+    public FourInLineLogic() {
         grid = new PlayerType[WIDTH][HEIGHT];
     }
 
     public int addPlayerMove(int x) {
         int y = getFirstEmptyY(x);
-        if (y == -1) return -1; // kolona puna
+        if (y == -1) return -1;
         addMove(x, y, PlayerType.Player);
         gameEndedCheck(x, y, true);
         return y;
@@ -59,14 +62,13 @@ public abstract class GameLogic {
                 }
             }
         }
-        
-        if (x < 0 || !canPlay(x)) return null; // nema gde da igra
+
+        if (x < 0 || !canPlay(x)) return null;
 
         int y = addMove(x, PlayerType.Opponent);
         gameEndedCheck(x, y, true);
         return new Field(x, y);
     }
-
 
     public boolean canPlay(int x) {
         return grid[x][0] == null;
@@ -89,7 +91,7 @@ public abstract class GameLogic {
 
     protected int addMove(int x, PlayerType pt) {
         int y = getFirstEmptyY(x);
-        if (y == -1) return -1; // kolona puna
+        if (y == -1) return -1;
         addMove(x, y, pt);
         return y;
     }
@@ -101,9 +103,10 @@ public abstract class GameLogic {
     }
 
     protected abstract MinMaxRes getMax(float alpha, float beta);
+
     protected abstract MinMaxRes getMin(float alpha, float beta);
 
-    protected boolean noMoreMoves() {
+    public boolean noMoreMoves() {
         for (int x = 0; x < WIDTH; x++) {
             if (canPlay(x)) return false;
         }
@@ -115,10 +118,10 @@ public abstract class GameLogic {
     }
 
     protected boolean gameEndedCheck(int x, int y, boolean save) {
-        return gameEndedHorizontally(x, y, save) ||
-               gameEndedVertically(x, y, save) ||
-               gameEndedDiagonallyLeft(x, y, save) ||
-               gameEndedDiagonallyRight(x, y, save);
+        return gameEndedHorizontally(x, y, save)
+                || gameEndedVertically(x, y, save)
+                || gameEndedDiagonallyLeft(x, y, save)
+                || gameEndedDiagonallyRight(x, y, save);
     }
 
     protected boolean gameEndedHorizontally(int x, int y, boolean save) {
